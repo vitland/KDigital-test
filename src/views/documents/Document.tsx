@@ -9,6 +9,7 @@ import {
   CSmartTable,
   CSpinner,
   CButton,
+  CLoadingButton,
   CModalFooter,
   CCardHeader,
 } from '@coreui/react-pro'
@@ -79,6 +80,9 @@ const Document = (): JSX.Element => {
   const [downloadDocumentMimeType, setDownloadDocumentMimeType] = useState('')
   const [titleName, setTitleName] = useState('')
   const [dataFormat, setDataFormat] = useState('')
+
+  const [loadingDocument, setLoadingDocument] = useState(false)
+  const [printingDocument, setPrintingDocument] = useState(false)
 
   const { id } = useParams()
   const [searchParams] = useSearchParams()
@@ -155,38 +159,60 @@ const Document = (): JSX.Element => {
             )}
           </div>
           <div className="d-grid gap-4 d-md-flex justify-content-md-end">
-            <CButton
+            <CLoadingButton
+              loading={loadingDocument}
+              disabled={loadingDocument}
               style={{
                 width: '309px',
-                marginTop: '5%',
+                marginTop: '1%',
                 backgroundColor: '#747DEA',
               }}
-              onClick={() =>
-                handleDownloadOrPrint(
-                  showPicture?.file?.url,
-                  `${docName}`,
-                  false,
+              onClick={() => {
+                setLoadingDocument(true)
+                new Promise((res) =>
+                  res(
+                    handleDownloadOrPrint(
+                      showPicture?.file?.url,
+                      `${docName}`,
+                      false,
+                    ),
+                  ),
+                ).then(() =>
+                  setTimeout(() => {
+                    setLoadingDocument(false)
+                  }, 1000),
                 )
-              }
+              }}
             >
               Скачать
-            </CButton>
-            <CButton
+            </CLoadingButton>
+            <CLoadingButton
+              loading={printingDocument}
+              disabled={printingDocument}
               style={{
                 width: '309px',
-                marginTop: '5%',
+                marginTop: '1%',
                 backgroundColor: '#747DEA',
               }}
-              onClick={() =>
-                handleDownloadOrPrint(
-                  showPicture?.file?.url,
-                  `${docName}`,
-                  true,
+              onClick={() => {
+                setPrintingDocument(true)
+                new Promise((res) =>
+                  res(
+                    handleDownloadOrPrint(
+                      showPicture?.file?.url,
+                      `${docName}`,
+                      true,
+                    ),
+                  ),
+                ).then(() =>
+                  setTimeout(() => {
+                    setPrintingDocument(false)
+                  }, 1000),
                 )
-              }
+              }}
             >
               Печать
-            </CButton>
+            </CLoadingButton>
           </div>
         </CCardBody>
       </CCard>
